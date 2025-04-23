@@ -41,3 +41,9 @@ pnpmfile.js
 .npmrc
 src/main/frontend/generated
 /src/main/bundles/
+/package.json
+/package-lock.json
+/types.d.ts
+/tsconfig.json
+/vite.config.ts
+/vite.generated.ts
