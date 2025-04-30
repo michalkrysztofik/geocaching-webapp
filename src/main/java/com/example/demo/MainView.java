@@ -7,6 +7,7 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import org.springframework.beans.factory.annotation.Autowired;
 import software.xdev.vaadin.maps.leaflet.MapContainer;
 import software.xdev.vaadin.maps.leaflet.basictypes.LLatLng;
 import software.xdev.vaadin.maps.leaflet.layer.raster.LTileLayer;
@@ -21,6 +22,9 @@ import software.xdev.vaadin.maps.leaflet.registry.LDefaultComponentManagementReg
 @Route("")
 public class MainView extends VerticalLayout {
 
+  @Autowired
+  private GreetService greetService;
+
   public MainView() {
     demoGreet();
     showMap();
@@ -32,10 +36,9 @@ public class MainView extends VerticalLayout {
 
     // Button click listeners can be defined as lambda expressions
     var greeting = new Paragraph();
-    GreetService greetService = new GreetService();
-    Button button = new Button("Say hello", e -> {
-      greeting.setText(greetService.greet(textField.getValue()));
-    });
+    Button button = new Button("Say hello", e ->
+      greeting.setText(greetService.greet(textField.getValue()))
+    );
 
     // Theme variants give you predefined extra styles for components.
     // Example: Primary button is more prominent look.
