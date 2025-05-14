@@ -6,7 +6,9 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLink;
 import org.springframework.beans.factory.annotation.Autowired;
 import software.xdev.vaadin.maps.leaflet.MapContainer;
 import software.xdev.vaadin.maps.leaflet.basictypes.LLatLng;
@@ -20,14 +22,18 @@ import software.xdev.vaadin.maps.leaflet.registry.LDefaultComponentManagementReg
  * The main view contains a button and a click listener.
  */
 @Route("")
+@PageTitle("Home - GeocachingWebApp")
 public class MainView extends VerticalLayout {
 
   @Autowired
   private GreetService greetService;
 
   public MainView() {
+    // Use custom CSS classes to apply styling. This is defined in shared-styles.css.
+    addClassName("centered-content");
     demoGreet();
     showMap();
+    add(new RouterLink("Sample Geocache", SampleListing.class));
   }
 
   private void demoGreet() {
@@ -47,9 +53,6 @@ public class MainView extends VerticalLayout {
     // You can specify keyboard shortcuts for buttons.
     // Example: Pressing enter in this view clicks the Button.
     button.addClickShortcut(Key.ENTER);
-
-    // Use custom CSS classes to apply styling. This is defined in shared-styles.css.
-    addClassName("centered-content");
 
     add(textField, button, greeting);
   }
