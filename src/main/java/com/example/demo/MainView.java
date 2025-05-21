@@ -8,7 +8,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouterLink;
 import org.springframework.beans.factory.annotation.Autowired;
 import software.xdev.vaadin.maps.leaflet.MapContainer;
 import software.xdev.vaadin.maps.leaflet.basictypes.LLatLng;
@@ -76,12 +75,12 @@ public class MainView extends VerticalLayout {
     map.addLayer(LTileLayer.createDefaultForOpenStreetMapTileServer(reg));
 
     // Set what part of the world should be shown
-    map.setView(new LLatLng(reg, 52.09232,21.32782), 11);
+    map.setView(new LLatLng(reg, 52.09232, 21.32782), 11);
 
     // Create a new marker
-    new LMarker(reg, new LLatLng(reg, 52.09232,21.32782))
+    new LMarker(reg, new LLatLng(reg, 52.09232, 21.32782))
       // Bind a popup which is displayed when clicking the marker
-      .bindPopup("<a href='/sample_listing'>Ambona na wzniesieniu - OPA04C</a>")
+      .bindPopup("<a href='/listing/OPA04C'>Ambona na wzniesieniu - OPA04C</a>")
       .addTo(map);
   }
 
