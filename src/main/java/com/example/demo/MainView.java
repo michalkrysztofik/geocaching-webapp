@@ -33,7 +33,7 @@ public class MainView extends VerticalLayout {
     addClassName("centered-content");
     demoGreet();
     showMap();
-    add(new RouterLink("Sample Geocache", SampleListing.class));
+    //add(new RouterLink("Sample Geocache", SampleListing.class));
   }
 
   private void demoGreet() {
@@ -76,12 +76,12 @@ public class MainView extends VerticalLayout {
     map.addLayer(LTileLayer.createDefaultForOpenStreetMapTileServer(reg));
 
     // Set what part of the world should be shown
-    map.setView(new LLatLng(reg, 52.254779538366435, 20.998446764397098), 16);
+    map.setView(new LLatLng(reg, 52.09232,21.32782), 11);
 
     // Create a new marker
-    new LMarker(reg, new LLatLng(reg, 52.254779538366435, 20.998446764397098))
+    new LMarker(reg, new LLatLng(reg, 52.09232,21.32782))
       // Bind a popup which is displayed when clicking the marker
-      .bindPopup("Kontomatik")
+      .bindPopup("<a href='/sample_listing'>Ambona na wzniesieniu - OPA04C</a>")
       .addTo(map);
   }
 

@@ -19,16 +19,17 @@ public class SampleListing extends VerticalLayout {
     var listingOwner = new Paragraph("Właściciel: Michu4000");
     var type = new Paragraph("Typ: Skrzynka tradycyjna");
     var coords = new Paragraph("Współrzędne: N 52° 05.539' E 21° 19.669'");
+    var state = new Paragraph("Status: Aktywna");
+    var size = new Paragraph("Wielkość: Mała");
     var difficulty = new Paragraph("Trudność: 2/5");
-    basicInfo.add(listingOwner, type, coords, difficulty);
+    basicInfo.add(listingOwner, type, coords, state, size, difficulty);
 
-    UnorderedList content = new UnorderedList(
+    var attributes = new Details("Atrybuty:", new UnorderedList(
       new ListItem("Przyjazna dla rodzin z dziećmi"),
       new ListItem("Można dojechać rowerem"),
       new ListItem("Na łonie natury"),
       new ListItem("Można dojechać rowerem")
-    );
-    var attributes = new Details("Attributes:", content);
+    ));
     attributes.setOpened(true);
 
     var details = new Paragraph("""
@@ -41,10 +42,10 @@ public class SampleListing extends VerticalLayout {
       Powodzenia ;)""");
 
     var spoiler = new Details("Spoiler:", new Paragraph("Ukryta na wysokości ok. 3-4m, na pokręconej sośnie."));
-    attributes.setOpened(false);
+    spoiler.setOpened(false);
 
-    var photos = new Div("Zdjęcia: ...");
-    var waypoints = new Div("Dodatkowe interesujące miejsa: ...");
+    var photos = new Div("Zdjęcia: TODO");
+    var waypoints = new Div("Dodatkowe interesujące miejsa: TODO");
 
     add(title, basicInfo, attributes, details, spoiler, photos, waypoints, new RouterLink("GO BACK", MainView.class));
   }
