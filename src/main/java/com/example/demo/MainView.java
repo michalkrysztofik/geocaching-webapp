@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import com.example.demo.geocaches.GeocacheRepository;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -26,8 +28,14 @@ public class MainView extends VerticalLayout {
 
   @Autowired
   private GreetService greetService;
+  @Autowired
+  private GeocacheRepository geocacheRepository;
 
   public MainView() {
+  }
+
+  @Override
+  protected void onAttach(AttachEvent attachEvent) {
     // Use custom CSS classes to apply styling. This is defined in shared-styles.css.
     addClassName("centered-content");
     demoGreet();
@@ -76,12 +84,17 @@ public class MainView extends VerticalLayout {
 
     // Set what part of the world should be shown
     map.setView(new LLatLng(reg, 52.09232, 21.32782), 11);
+    addGeocachesToMap(reg, map);
+  }
 
-    // Create a new marker
-    new LMarker(reg, new LLatLng(reg, 52.09232, 21.32782))
-      // Bind a popup which is displayed when clicking the marker
-      .bindPopup("<a href='/listing/OPA04C'>Ambona na wzniesieniu - OPA04C</a>")
-      .addTo(map);
+  private void addGeocachesToMap(LComponentManagementRegistry reg, LMap map) {
+    geocacheRepository.findAll().forEach(geocache -> {
+      // Create a new marker
+      new LMarker(reg, new LLatLng(reg, geocache.coordLat, geocache.coordLon))
+        // Bind a popup which is displayed when clicking the marker
+        .bindPopup("<a href='/listing/" + geocache.code + "'>" + geocache.name + " - " + geocache.code + "</a>")
+        .addTo(map);
+    });
   }
 
 }
