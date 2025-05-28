@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.demo.geocaches.CreateListing;
 import com.example.demo.geocaches.GeocacheRepository;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Key;
@@ -10,6 +11,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLink;
 import org.springframework.beans.factory.annotation.Autowired;
 import software.xdev.vaadin.maps.leaflet.MapContainer;
 import software.xdev.vaadin.maps.leaflet.basictypes.LLatLng;
@@ -40,7 +42,7 @@ public class MainView extends VerticalLayout {
     addClassName("centered-content");
     demoGreet();
     showMap();
-    //add(new RouterLink("Sample Geocache", SampleListing.class));
+    add(new RouterLink("Create new geocache listing", CreateListing.class));
   }
 
   private void demoGreet() {
