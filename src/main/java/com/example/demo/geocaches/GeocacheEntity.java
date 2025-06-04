@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
+import java.util.Set;
 
 @Document
 public class GeocacheEntity {
@@ -19,7 +20,7 @@ public class GeocacheEntity {
   public String state;
   public String size;
   public String difficulty;
-  public List<String> attributes;
+  public Set<String> attributes;
   public String description;
   public String spoiler;
 
