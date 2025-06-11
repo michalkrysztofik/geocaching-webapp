@@ -3,7 +3,6 @@ package com.example.demo.geocaches;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
 import java.util.Set;
 
 @Document
@@ -23,7 +22,5 @@ public class GeocacheEntity {
   public Set<String> attributes;
   public String description;
   public String spoiler;
-
-  public GeocacheEntity(){};
 
 }
