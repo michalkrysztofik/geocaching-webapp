@@ -2,7 +2,7 @@
 # Create a VM then deploy your application to the VM
 # https://spring-gcp.saturnism.me/getting-started/helloworld/compute-engine
 
-./gradlew bootJar
+./gradlew clean bootJar
 JAR_PATH=build/libs/geocaching-webapp.jar
 # `gcloud services enable compute.googleapis.com` if not enabled
 gcloud compute instances stop geocaching-webapp --zone=europe-central2-c --project=silken-glyph-365213
