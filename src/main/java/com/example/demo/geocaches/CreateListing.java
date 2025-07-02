@@ -6,12 +6,15 @@ import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,11 +31,10 @@ public class CreateListing extends VerticalLayout {
     addClassName("centered-content");
 
     var name = addTextField("Nazwa skrzynki:", VaadinIcon.FILE_FONT.create());
-    var owner = addTextField("Właściciel:", VaadinIcon.USER.create()); // will be removed after adding userness
-    // VaadinIcon.PUZZLE_PIECE.create()
-    var type = addRadioButton("Typ:", List.of("tradycyjna", "multicache", "zagadkowa", "nietypowa"));
+    var owner = addTextField("Właściciel:", VaadinIcon.USER.create()); // TODO remove after adding userness
+    var type = addRadioButton("Typ:", VaadinIcon.PUZZLE_PIECE.create(), List.of("tradycyjna", "multicache", "zagadkowa", "nietypowa"));
 
-    // TODO something better
+    // TODO add some better input method for coords
     var coordLat = addTextField("Szerokość geograficzna (N/S):", VaadinIcon.LOCATION_ARROW_CIRCLE_O.create());
     coordLat.setHelperText("Format: 52.09232 for N or with '-' for S");
     coordLat.setMinWidth(300, Unit.PIXELS);
@@ -42,12 +44,9 @@ public class CreateListing extends VerticalLayout {
     coordLon.setMinWidth(300, Unit.PIXELS);
     coordLon.setPattern("-?\\d{1,3}\\.\\d+");
 
-    // VaadinIcon.FLAG.create()
-    var state = addRadioButton("Status:", List.of("aktywna", "nieaktywna"));
-    // VaadinIcon.CUBE.create()
-    var size = addRadioButton("Wielkość:", List.of("mikro", "mała", "średnia", "duża"));
-    // VaadinIcon.ABACUS.create()
-    var difficulty = addRadioButton("Trudność:", List.of("1/5", "2/5", "3/5", "4/5", "5/5"));
+    var state = addRadioButton("Status:", VaadinIcon.FLAG.create(), List.of("aktywna", "nieaktywna"));
+    var size = addRadioButton("Wielkość:", VaadinIcon.CUBE.create(), List.of("mikro", "mała", "średnia", "duża"));
+    var difficulty = addRadioButton("Trudność:", VaadinIcon.ABACUS.create(), List.of("1/5", "2/5", "3/5", "4/5", "5/5"));
     var attributes = addAttributes();
     var description = addTextArea("Opis:", VaadinIcon.EDIT.create());
     var spoiler = addTextArea("Spoiler:", VaadinIcon.LIGHTBULB.create());
@@ -69,19 +68,32 @@ public class CreateListing extends VerticalLayout {
     return textField;
   }
 
-  private RadioButtonGroup<String> addRadioButton(String label, List<String> options) {
+  private RadioButtonGroup<String> addRadioButton(String labelText, Icon icon, List<String> options) {
     RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
-    radioGroup.setLabel(label);
+    //radioGroup.getElement().appendChild(label(labelText, icon)); // TODO make it work
+    radioGroup.setLabel(labelText); //
     radioGroup.setItems(options);
     radioGroup.setValue(options.iterator().next());
+    radioGroup.setRequired(true);
     add(radioGroup);
     return radioGroup;
   }
 
+  private static Element label(String label, Icon icon) {
+    var labelSpan = new Span(label);
+    var labelLayout = new HorizontalLayout(icon, labelSpan);
+    labelLayout.setAlignItems(Alignment.CENTER);
+    labelLayout.setPadding(false);
+    labelLayout.setSpacing(true);
+    labelLayout.getElement().setAttribute("slot", "label");
+    labelLayout.setId("label-" + java.util.UUID.randomUUID());
+    return labelLayout.getElement();
+  }
+
   private CheckboxGroup<String> addAttributes() {
     CheckboxGroup<String> checkboxGroup = new CheckboxGroup<>();
-    // VaadinIcon.LINES_LIST.create()
-    checkboxGroup.setLabel("Atrybuty:");
+    //checkboxGroup.getElement().appendChild(label("Atrybuty:", VaadinIcon.LINES_LIST.create()));
+    checkboxGroup.setLabel("Atrybuty:"); //
     checkboxGroup.setItems(
       "Szybka skrzynka",
       "Dostępna dla niepełnosprawnych",
@@ -121,7 +133,7 @@ public class CreateListing extends VerticalLayout {
     double lat = Double.parseDouble(coordLat.getValue());
     double lon = Double.parseDouble(coordLon.getValue());
     // TODO use format: N52° 05.539' E21° 19.669'
-    geocache.coordsVisible = (lat > 0 ? "N" : "S") + lat + "° " + (lon > 0 ? "E" : "W") + lon + "°";
+    geocache.coordsVisible = (lat > 0 ? "N" : "S") + Math.abs(lat) + "° " + (lon > 0 ? "E" : "W") + Math.abs(lon) + "°";
     geocache.coordLat = lat;
     geocache.coordLon = lon;
 
