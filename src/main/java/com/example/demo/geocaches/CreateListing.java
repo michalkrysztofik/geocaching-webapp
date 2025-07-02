@@ -6,6 +6,7 @@ import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -14,8 +15,11 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.validator.RegexpValidator;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.theme.lumo.LumoUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -25,6 +29,8 @@ public class CreateListing extends VerticalLayout {
 
   @Autowired
   private GeocacheRepository geocacheRepository;
+
+  private final Binder<GeocacheEntity> binder = new Binder<>(GeocacheEntity.class);
 
   @Override
   protected void onAttach(AttachEvent attachEvent) {
@@ -38,11 +44,9 @@ public class CreateListing extends VerticalLayout {
     var coordLat = addTextField("Szerokość geograficzna (N/S):", VaadinIcon.LOCATION_ARROW_CIRCLE_O.create());
     coordLat.setHelperText("Format: 52.09232 for N or with '-' for S");
     coordLat.setMinWidth(300, Unit.PIXELS);
-    coordLat.setPattern("-?\\d{1,2}\\.\\d+");
     var coordLon = addTextField("Długość geograficzna (E/W):", VaadinIcon.LOCATION_ARROW_CIRCLE_O.create());
     coordLon.setHelperText("Format: 21.32782 for E or with '-' for W");
     coordLon.setMinWidth(300, Unit.PIXELS);
-    coordLon.setPattern("-?\\d{1,3}\\.\\d+");
 
     var state = addRadioButton("Status:", VaadinIcon.FLAG.create(), List.of("aktywna", "nieaktywna"));
     var size = addRadioButton("Wielkość:", VaadinIcon.CUBE.create(), List.of("mikro", "mała", "średnia", "duża"));
@@ -51,12 +55,55 @@ public class CreateListing extends VerticalLayout {
     var description = addTextArea("Opis:", VaadinIcon.EDIT.create());
     var spoiler = addTextArea("Spoiler:", VaadinIcon.LIGHTBULB.create());
 
+    addValidation(name, owner, type, coordLat, coordLon, state, size, difficulty, attributes, description, spoiler);
     var saveButton = new Button("Zapisz");
     saveButton.addClickListener(clickEvent -> {
-      saveGeocache(name, owner, type, coordLat, coordLon, state, size, difficulty, attributes, description, spoiler);
-      UI.getCurrent().navigate("");
+      saveGeocacheAndGoHome(name, owner, type, coordLat, coordLon, state, size, difficulty, attributes, description, spoiler);
     });
     add(saveButton);
+  }
+
+  private void addValidation(TextField name, TextField owner, RadioButtonGroup<String> type, TextField coordLat, TextField coordLon,
+                             RadioButtonGroup<String> state, RadioButtonGroup<String> size, RadioButtonGroup<String> difficulty,
+                             CheckboxGroup<String> attributes, TextArea description, TextArea spoiler) {
+    binder.forField(name)
+      .asRequired()
+      .bind(GeocacheEntity::getName, GeocacheEntity::setName);
+    binder.forField(owner)
+      .asRequired()
+      .bind(GeocacheEntity::getOwner, GeocacheEntity::setOwner);
+    binder.forField(type)
+      .asRequired()
+      .bind(GeocacheEntity::getType, GeocacheEntity::setType);
+    binder.forField(coordLat)
+      .asRequired()
+      .withValidator(new RegexpValidator("Invalid coord format", "-?\\d{1,2}\\.\\d+"))
+      .bind(entity -> entity.getCoordLat().toString(), (entity, val) -> entity.setCoordLat(Double.parseDouble(val)));
+    binder.forField(coordLon)
+      .asRequired()
+      .withValidator(new RegexpValidator("Invalid coord format", "-?\\d{1,2}\\.\\d+"))
+      .bind(entity -> entity.getCoordLon().toString(), (entity, val) -> entity.setCoordLon(Double.parseDouble(val)));
+    binder.forField(state)
+      .asRequired()
+      .bind(GeocacheEntity::getState, GeocacheEntity::setState);
+    binder.forField(size)
+      .asRequired()
+      .bind(GeocacheEntity::getSize, GeocacheEntity::setSize);
+    binder.forField(difficulty)
+      .asRequired()
+      .bind(GeocacheEntity::getDifficulty, GeocacheEntity::setDifficulty);
+    binder.forField(attributes)
+      .bind(GeocacheEntity::getAttributes, GeocacheEntity::setAttributes);
+    binder.forField(description)
+      .asRequired()
+      .bind(GeocacheEntity::getDescription, GeocacheEntity::setDescription);
+    binder.forField(spoiler)
+      .asRequired()
+      .bind(GeocacheEntity::getSpoiler, GeocacheEntity::setSpoiler);
+
+    var beanValidationErrors = new Div();
+    beanValidationErrors.addClassName(LumoUtility.TextColor.ERROR);
+    binder.setStatusLabel(beanValidationErrors);
   }
 
   private TextField addTextField(String label, Icon icon) {
@@ -121,29 +168,34 @@ public class CreateListing extends VerticalLayout {
     return textArea;
   }
 
-  private void saveGeocache(TextField name, TextField owner, RadioButtonGroup<String> type, TextField coordLat, TextField coordLon,
-                            RadioButtonGroup<String> state, RadioButtonGroup<String> size, RadioButtonGroup<String> difficulty,
-                            CheckboxGroup<String> attributes, TextArea description, TextArea spoiler
+  private void saveGeocacheAndGoHome(TextField name, TextField owner, RadioButtonGroup<String> type, TextField coordLat, TextField coordLon,
+                                     RadioButtonGroup<String> state, RadioButtonGroup<String> size, RadioButtonGroup<String> difficulty,
+                                     CheckboxGroup<String> attributes, TextArea description, TextArea spoiler
   ) {
     var geocache = new GeocacheEntity();
     geocache.name = name.getValue();
     geocache.owner = owner.getValue();
     geocache.type = type.getValue();
-
-    double lat = Double.parseDouble(coordLat.getValue());
-    double lon = Double.parseDouble(coordLon.getValue());
-    // TODO use format: N52° 05.539' E21° 19.669'
-    geocache.coordsVisible = (lat > 0 ? "N" : "S") + Math.abs(lat) + "° " + (lon > 0 ? "E" : "W") + Math.abs(lon) + "°";
-    geocache.coordLat = lat;
-    geocache.coordLon = lon;
-
+    try {
+      geocache.coordLat = Double.parseDouble(coordLat.getValue());
+      geocache.coordLon = Double.parseDouble(coordLon.getValue());
+    } catch (NumberFormatException e) {/*ignored*/}
     geocache.state = state.getValue();
     geocache.size = size.getValue();
     geocache.difficulty = difficulty.getValue();
     geocache.attributes = attributes.getSelectedItems();
     geocache.description = description.getValue();
     geocache.spoiler = spoiler.getValue();
+
+    if (!binder.writeBeanIfValid(geocache))
+      return;
+
+    double lat = geocache.getCoordLat();
+    double lon = geocache.getCoordLon();
+    // TODO use format: N52° 05.539' E21° 19.669'
+    geocache.coordsVisible = (lat > 0 ? "N" : "S") + Math.abs(lat) + "° " + (lon > 0 ? "E" : "W") + Math.abs(lon) + "°";
     geocacheRepository.save(geocache);
+    UI.getCurrent().navigate("");
   }
 
 }
