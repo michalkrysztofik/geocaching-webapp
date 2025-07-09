@@ -20,11 +20,13 @@ import com.vaadin.flow.data.validator.RegexpValidator;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 @Route("/create_listing")
+@PermitAll
 public class CreateListing extends VerticalLayout {
 
   @Autowired

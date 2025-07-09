@@ -4,6 +4,7 @@ import com.example.demo.geocaches.CreateListing;
 import com.example.demo.geocaches.GeocacheRepository;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Paragraph;
@@ -12,7 +13,10 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.server.VaadinServletRequest;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import software.xdev.vaadin.maps.leaflet.MapContainer;
 import software.xdev.vaadin.maps.leaflet.basictypes.LLatLng;
 import software.xdev.vaadin.maps.leaflet.layer.raster.LTileLayer;
@@ -25,6 +29,7 @@ import software.xdev.vaadin.maps.leaflet.registry.LDefaultComponentManagementReg
  * The main view contains a button and a click listener.
  */
 @Route("")
+@PermitAll
 @PageTitle("Home - GeocachingWebApp")
 public class MainView extends VerticalLayout {
 
@@ -43,6 +48,7 @@ public class MainView extends VerticalLayout {
     demoGreet();
     showMap();
     add(new RouterLink("Create new geocache listing", CreateListing.class));
+    add(createLogOutButton());
   }
 
   private void demoGreet() {
@@ -96,6 +102,16 @@ public class MainView extends VerticalLayout {
         // Bind a popup which is displayed when clicking the marker
         .bindPopup("<a href='/listing/" + geocache.code + "'>" + geocache.name + " - " + geocache.code + "</a>")
         .addTo(map);
+    });
+  }
+
+  private Button createLogOutButton() {
+    return new Button("Logout", click -> {
+      UI.getCurrent().getPage().setLocation("/");
+      SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+      logoutHandler.logout(
+        VaadinServletRequest.getCurrent().getHttpServletRequest(), null,
+        null);
     });
   }
 

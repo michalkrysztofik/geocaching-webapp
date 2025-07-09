@@ -6,12 +6,14 @@ import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Route("/listing")
+@PermitAll
 public class Listing extends VerticalLayout implements HasUrlParameter<String>, HasDynamicTitle {
 
   @Autowired
