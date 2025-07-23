@@ -1,22 +1,19 @@
-package com.example.demo;
+package com.example.demo.users;
 
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 @Route("login")
-@PageTitle("Login")
+@PageTitle("Sign-in - GeocachingWebApp")
 @AnonymousAllowed
-public class LoginView extends VerticalLayout implements BeforeEnterObserver {
+public class UserSignInView extends VerticalLayout implements BeforeEnterObserver {
 
   private final LoginForm login = new LoginForm();
 
-  public LoginView() {
+  public UserSignInView() {
     addClassName("login-view");
     setSizeFull();
 
@@ -24,8 +21,9 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     setAlignItems(Alignment.CENTER);
 
     login.setAction("login");
+    RouterLink registrationLink = new RouterLink("Sign-up", UserRegistrationView.class);
 
-    add(new H1("Geocaching WebApp"), login);
+    add(new H1("Sign-in - GeocachingWebApp"), login, registrationLink);
   }
 
   @Override

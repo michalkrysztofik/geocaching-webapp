@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Route("/listing")
 @PermitAll
-public class Listing extends VerticalLayout implements HasUrlParameter<String>, HasDynamicTitle {
+public class ShowListingView extends VerticalLayout implements HasUrlParameter<String>, HasDynamicTitle {
 
   @Autowired
   private GeocacheRepository geocacheRepository;
@@ -26,7 +26,7 @@ public class Listing extends VerticalLayout implements HasUrlParameter<String>, 
   private final Details spoiler = new Details("Spoiler:", new Paragraph());
   private final Paragraph description = new Paragraph();
 
-  public Listing() {
+  public ShowListingView() {
     addClassName("centered-content");
     attributes.setOpened(true);
     spoiler.setOpened(false);
@@ -64,7 +64,7 @@ public class Listing extends VerticalLayout implements HasUrlParameter<String>, 
 
   @Override
   public String getPageTitle() {
-    return geocache.name;
+    return geocache.name + " - GeocachingWebApp";
   }
 
   @Override

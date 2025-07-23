@@ -1,5 +1,6 @@
 package com.example.demo.geocaches;
 
+import com.example.demo.users.AuthenticatedUser;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
@@ -18,6 +19,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.validator.RegexpValidator;
 import com.vaadin.flow.dom.Element;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
@@ -27,10 +29,13 @@ import java.util.List;
 
 @Route("/create_listing")
 @PermitAll
-public class CreateListing extends VerticalLayout {
+@PageTitle("Create listing - GeocachingWebApp")
+public class CreateListingView extends VerticalLayout {
 
   @Autowired
   private GeocacheRepository geocacheRepository;
+  @Autowired
+  private AuthenticatedUser authenticatedUser;
 
   private final Binder<GeocacheEntity> binder = new Binder<>(GeocacheEntity.class);
 
@@ -39,7 +44,6 @@ public class CreateListing extends VerticalLayout {
     addClassName("centered-content");
 
     var name = addTextField("Nazwa skrzynki:", VaadinIcon.FILE_FONT.create());
-    var owner = addTextField("Właściciel:", VaadinIcon.USER.create()); // TODO remove after adding userness
     var type = addRadioButton("Typ:", VaadinIcon.PUZZLE_PIECE.create(), List.of("tradycyjna", "multicache", "zagadkowa", "nietypowa"));
 
     // TODO add some better input method for coords
@@ -57,23 +61,20 @@ public class CreateListing extends VerticalLayout {
     var description = addTextArea("Opis:", VaadinIcon.EDIT.create());
     var spoiler = addTextArea("Spoiler:", VaadinIcon.LIGHTBULB.create());
 
-    addValidation(name, owner, type, coordLat, coordLon, state, size, difficulty, attributes, description, spoiler);
+    addValidation(name, type, coordLat, coordLon, state, size, difficulty, attributes, description, spoiler);
     var saveButton = new Button("Zapisz");
-    saveButton.addClickListener(clickEvent -> {
-      saveGeocacheAndGoHome(name, owner, type, coordLat, coordLon, state, size, difficulty, attributes, description, spoiler);
-    });
+    saveButton.addClickListener(clickEvent ->
+      saveGeocacheAndGoHome(name, type, coordLat, coordLon, state, size, difficulty, attributes, description, spoiler)
+    );
     add(saveButton);
   }
 
-  private void addValidation(TextField name, TextField owner, RadioButtonGroup<String> type, TextField coordLat, TextField coordLon,
+  private void addValidation(TextField name, RadioButtonGroup<String> type, TextField coordLat, TextField coordLon,
                              RadioButtonGroup<String> state, RadioButtonGroup<String> size, RadioButtonGroup<String> difficulty,
                              CheckboxGroup<String> attributes, TextArea description, TextArea spoiler) {
     binder.forField(name)
       .asRequired()
       .bind(GeocacheEntity::getName, GeocacheEntity::setName);
-    binder.forField(owner)
-      .asRequired()
-      .bind(GeocacheEntity::getOwner, GeocacheEntity::setOwner);
     binder.forField(type)
       .asRequired()
       .bind(GeocacheEntity::getType, GeocacheEntity::setType);
@@ -170,13 +171,13 @@ public class CreateListing extends VerticalLayout {
     return textArea;
   }
 
-  private void saveGeocacheAndGoHome(TextField name, TextField owner, RadioButtonGroup<String> type, TextField coordLat, TextField coordLon,
+  private void saveGeocacheAndGoHome(TextField name, RadioButtonGroup<String> type, TextField coordLat, TextField coordLon,
                                      RadioButtonGroup<String> state, RadioButtonGroup<String> size, RadioButtonGroup<String> difficulty,
                                      CheckboxGroup<String> attributes, TextArea description, TextArea spoiler
   ) {
     var geocache = new GeocacheEntity();
     geocache.name = name.getValue();
-    geocache.owner = owner.getValue();
+    geocache.owner = authenticatedUser.get().userName;
     geocache.type = type.getValue();
     try {
       geocache.coordLat = Double.parseDouble(coordLat.getValue());
