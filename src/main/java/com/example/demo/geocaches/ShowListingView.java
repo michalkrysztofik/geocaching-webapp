@@ -1,6 +1,7 @@
 package com.example.demo.geocaches;
 
 import com.example.demo.MainView;
+import com.example.demo.users.AuthenticatedUser;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.html.*;
@@ -18,6 +19,8 @@ public class ShowListingView extends VerticalLayout implements HasUrlParameter<S
 
   @Autowired
   private GeocacheRepository geocacheRepository;
+  @Autowired
+  private AuthenticatedUser authenticatedUser;
   private GeocacheEntity geocache;
 
   private final H1 title = new H1();
@@ -34,6 +37,9 @@ public class ShowListingView extends VerticalLayout implements HasUrlParameter<S
     var waypoints = new Div("Dodatkowe interesujące miejsa: TODO");
     add(
       title, fillBasicInfo(), attributes, description, spoiler, photos, waypoints,
+      new Hr(),
+      new SubmitGeocacheLog(this::saveLog),
+      new Hr(),
       new RouterLink("GO BACK", MainView.class)
     );
   }
@@ -81,6 +87,12 @@ public class ShowListingView extends VerticalLayout implements HasUrlParameter<S
     ));
     description.setText(geocache.description);
     spoiler.add(new Paragraph(geocache.spoiler));
+  }
+
+  private void saveLog(GeocacheLogEntity log) {
+    log.userName = authenticatedUser.get().userName;
+    geocache.logs.add(log);
+    geocacheRepository.save(geocache);
   }
 
 }
