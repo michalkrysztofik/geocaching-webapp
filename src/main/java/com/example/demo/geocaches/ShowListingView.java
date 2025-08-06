@@ -3,6 +3,7 @@ package com.example.demo.geocaches;
 import com.example.demo.MainView;
 import com.example.demo.users.AuthenticatedUser;
 import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -28,6 +29,7 @@ public class ShowListingView extends VerticalLayout implements HasUrlParameter<S
   private final Details attributes = new Details("Atrybuty:", new UnorderedList());
   private final Details spoiler = new Details("Spoiler:", new Paragraph());
   private final Paragraph description = new Paragraph();
+  private final ShowGeocacheLogs showGeocacheLogs = new ShowGeocacheLogs();
 
   public ShowListingView() {
     addClassName("centered-content");
@@ -37,6 +39,8 @@ public class ShowListingView extends VerticalLayout implements HasUrlParameter<S
     var waypoints = new Div("Dodatkowe interesujące miejsa: TODO");
     add(
       title, fillBasicInfo(), attributes, description, spoiler, photos, waypoints,
+      new Hr(),
+      showGeocacheLogs,
       new Hr(),
       new SubmitGeocacheLog(this::saveLog),
       new Hr(),
@@ -87,12 +91,14 @@ public class ShowListingView extends VerticalLayout implements HasUrlParameter<S
     ));
     description.setText(geocache.description);
     spoiler.add(new Paragraph(geocache.spoiler));
+    showGeocacheLogs.load(geocache);
   }
 
   private void saveLog(GeocacheLogEntity log) {
     log.userName = authenticatedUser.get().userName;
     geocache.logs.add(log);
     geocacheRepository.save(geocache);
+    UI.getCurrent().getPage().reload();
   }
 
 }
